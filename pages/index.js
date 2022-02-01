@@ -87,7 +87,7 @@ export default function PaginaInicial() {
                         <TextField
                             value={username}
                             onChange={(event) => {
-                                //variavel com o novo valor digitado
+                                //valor do usuario digitado no input
                                 const valor = event.target.value;
 
                                 //atribuindo novo usuário
