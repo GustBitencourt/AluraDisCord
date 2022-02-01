@@ -1,6 +1,14 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
-import React, { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+import React, { useState, useEffect } from 'react';
 import appConfig from '../config.json';
+
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzczNTk2MywiZXhwIjoxOTU5MzExOTYzfQ.2IF9G7fSMbXAwUsGKFuleb99qiaHH8qTSfOjWutrlN4';
+const SUPABASE_URL = 'https://pzklaieximmgdarfygqk.supabase.co';
+
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+
 
 export default function ChatPage() {
     // Sua lógica vai aqui
@@ -10,24 +18,47 @@ export default function ChatPage() {
     //useState das caixas de mensagem enviadas
     const [listaDeMensagem, setListaDeMensagem] = useState([]);
 
+    useEffect(() => {
+        supabaseClient
+            .from('mensagens')
+            .select('*')
+            .order('id', { ascending: false })
+            .then(({ data }) => {
+                console.log('Dados do supabase: ', data)
+
+                setListaDeMensagem(data);
+            });      
+      
+    }, []);   
+
 
     //responsavel por adicionar mensagem na caixa de mensagens
     function handleNovaMensagem(novaMensagem) {
         //formatação de informações da mensagem enviada
         const mensagem = {
-            id: listaDeMensagem.length,
-            de: 'vanessamentonini',
+            // id: listaDeMensagem.length,
+            de: 'GustBitencourt',
             texto: novaMensagem,
-        }
-        //inserindo mensagem na caixa de mensagens
-        setListaDeMensagem([
-            mensagem,
-            ...listaDeMensagem,
-        ])
+        };
+
+        supabaseClient
+            .from('mensagens')
+            .insert([
+                mensagem
+            ])
+            .then(({ data }) => {
+                //inserindo mensagem na caixa de mensagens
+                setListaDeMensagem([
+                    // mensagem, <- não é mais necessário vamos enviar a posição pra api
+                    data[0],
+                    ...listaDeMensagem,
+                ])
+            })
+
 
         //limpando campo de mensagem
         setMensagem('');
-    }
+    }    
 
     // ./Sua lógica vai aqui
     return (
@@ -182,7 +213,7 @@ function MessageList(props) {
                                     display: 'inline-block',
                                     marginRight: '8px',
                                 }}
-                                src={`https://github.com/vanessametonini.png`}
+                                src={`https://github.com/${mensagem.de}.png`}
                             />
                             <Text tag="strong">
                                 {mensagem.de}
