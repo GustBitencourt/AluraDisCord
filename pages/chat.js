@@ -1,5 +1,6 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import { createClient } from '@supabase/supabase-js';
+import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 import appConfig from '../config.json';
 
@@ -9,8 +10,13 @@ const SUPABASE_URL = 'https://pzklaieximmgdarfygqk.supabase.co';
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 
-
 export default function ChatPage() {
+
+    //pegando usuario logado através do router de next
+    const roteamento = useRouter();
+    const usuarioLogado = roteamento.query.username;
+    
+
     // Sua lógica vai aqui
     //useState do campo de digitação
     const [mensagem, setMensagem] = useState('');
@@ -24,8 +30,7 @@ export default function ChatPage() {
             .select('*')
             .order('id', { ascending: false })
             .then(({ data }) => {
-                console.log('Dados do supabase: ', data)
-
+                console.log('Dados do supabase: ', data);
                 setListaDeMensagem(data);
             });      
       
@@ -37,7 +42,7 @@ export default function ChatPage() {
         //formatação de informações da mensagem enviada
         const mensagem = {
             // id: listaDeMensagem.length,
-            de: 'GustBitencourt',
+            de: usuarioLogado,
             texto: novaMensagem,
         };
 
