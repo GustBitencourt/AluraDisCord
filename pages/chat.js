@@ -10,6 +10,16 @@ const SUPABASE_URL = 'https://pzklaieximmgdarfygqk.supabase.co';
 
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+//responsavel por atualizar o banco permitindo comunicação
+function escutaMensagensTempoReal(adicionaMensagem) {
+    return supabaseClient
+        .from('mensagens')
+        .on('INSERT', (respostaSupabase) => {
+            adicionaMensagem(respostaSupabase.new);        
+            
+        })
+        .subscribe();
+}
 
 export default function ChatPage() {
 
@@ -33,7 +43,17 @@ export default function ChatPage() {
             .then(({ data }) => {
                 console.log('Dados do supabase: ', data);
                 setListaDeMensagem(data);
-            });      
+            });
+            
+        //funcao para modo sincrono - diferente do modo assincrono - ver commits
+        escutaMensagensTempoReal((novaMensagem) => {
+            setListaDeMensagem((mensagensAtuaisDaLista) => {
+                return [
+                    novaMensagem,
+                    ...mensagensAtuaisDaLista,
+                ]
+            })
+        });
       
     }, []);   
 
@@ -54,11 +74,7 @@ export default function ChatPage() {
             ])
             .then(({ data }) => {
                 //inserindo mensagem na caixa de mensagens
-                setListaDeMensagem([
-                    // mensagem, <- não é mais necessário vamos enviar a posição pra api
-                    data[0],
-                    ...listaDeMensagem,
-                ])
+                
             })
 
 
