@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 import appConfig from '../config.json';
+import { ButtonSendSticker } from '../src/components/ButtonSendSticker';
 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzczNTk2MywiZXhwIjoxOTU5MzExOTYzfQ.2IF9G7fSMbXAwUsGKFuleb99qiaHH8qTSfOjWutrlN4';
 const SUPABASE_URL = 'https://pzklaieximmgdarfygqk.supabase.co';
@@ -152,6 +153,12 @@ export default function ChatPage() {
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
                         />
+                        <ButtonSendSticker 
+                            onStickerClick={(sticker) => {
+                                handleNovaMensagem(':sticker: ' + sticker);
+
+                            }}
+                        />
                     </Box>
                 </Box>
             </Box>
@@ -233,8 +240,12 @@ function MessageList(props) {
                             >
                                 {(new Date().toLocaleDateString())}
                             </Text>
-                        </Box>
-                        {mensagem.texto}
+                        </Box>                            
+                            {mensagem.texto.startsWith(':sticker:') ? (                               
+                                <Image src={mensagem.texto.replace(':sticker:', '')} />
+                            ) : (
+                                mensagem.texto
+                            )}
                     </Text>
                 )
             })}
